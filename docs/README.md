@@ -1,9 +1,8 @@
-# Suzuyoi
+# <img src="./suzuyoi.webp" alt="Suzuyoi" width="50%" />
 
 A server software re-implementation for a certain mah-jong game,
-just: 
-<center>
+just:
+
 <img src="./suzumeyayoi.svg" alt="Suzume Yayoi" />
-</center>
 
 ## Build

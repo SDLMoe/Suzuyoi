@@ -1,0 +1,23 @@
+[versions]
+kotlin = "2.1.10" # Please also modify the kotlin-bom version below
+jline = "3.29.0"
+jupiter = "5.10.2"
+ktlint = "1.5.0"
+
+[plugins]
+kotlin = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+shadow = { id = "com.gradleup.shadow", version = "8.3.6" }
+githook = { id = "org.danilopianini.gradle-pre-commit-git-hooks", version = "2.0.20" }
+spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
+versions = { id = "com.github.ben-manes.versions", version = "0.52.0" }
+foojayResolver = { id = "org.gradle.toolchains.foojay-resolver", version = "0.9.0" }
+
+[libraries]
+kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version = "2.1.10" }
+kotlin-stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8" }
+kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test" }
+kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit" }
+
+# Only declared here so Dependabot knows when to update the referenced versions
+ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }

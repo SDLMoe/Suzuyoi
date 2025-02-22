@@ -1,0 +1,18 @@
+# IntelliJ project files
+.classpath
+.project
+.settings
+.idea
+*.iml
+out
+gen
+.DS_Store
+.idea0
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+.mvn/.develocity/
+.kotlin

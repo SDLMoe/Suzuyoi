@@ -16,9 +16,9 @@ gitHooks {
     conventionalCommits {
       defaultTypes()
     }
-    preCommit {
-      from(file("gradle/config/githook/precommit.sh"))
-    }
+  }
+  preCommit {
+    from(file("gradle/config/githook/precommit.sh"))
   }
   createHooks(true)
 }

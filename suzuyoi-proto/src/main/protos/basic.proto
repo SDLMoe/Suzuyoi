@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package base;
+option java_package = "moe.sdl.suzuyoi.protos";
+
+message BaseMessage {
+    string method_name = 1;
+    bytes data = 2;
+}

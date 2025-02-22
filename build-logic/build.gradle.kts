@@ -4,7 +4,7 @@ plugins {
 }
 
 dependencies {
-  implementation(kotlin("gradle-plugin"))
+  implementation(libs.plugins.kotlin.asDep())
   implementation(libs.plugins.foojayResolver.asDep())
   implementation(libs.plugins.shadow.asDep())
   implementation(libs.plugins.githook.asDep())

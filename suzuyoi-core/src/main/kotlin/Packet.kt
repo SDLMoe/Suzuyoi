@@ -119,7 +119,7 @@ data class Notify(
 ) : Packet()
 
 /**
- * server -> client actively
+ * client -> server
  */
 data class Request(
   val code: UShort,
@@ -128,7 +128,7 @@ data class Request(
 ) : Packet()
 
 /**
- * server -> client actively
+ * server -> client passively
  */
 data class Response(
   val code: UShort,

@@ -12,7 +12,6 @@ package moe.sdl.suzuyoi
 import moe.sdl.suzuyoi.protos.BaseMessage
 import okio.ByteString
 import okio.ByteString.Companion.readByteString
-import java.io.File
 import java.io.InputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentLinkedDeque
@@ -41,26 +40,10 @@ data class NameEntry(
   val methodName: String,
 )
 
-fun main() {
-  val root = File("/Users/col/Developer/majsoul-pro/records")
-  val ctx = Packet.Context(ConcurrentLinkedDeque(), 50)
-  root
-    .walk()
-    .maxDepth(1)
-    .asSequence()
-    .filter { it.isFile }
-    .filter { it.extension == "bin" }
-    .sortedBy {
-      val ts =
-        it.name.split('-', limit = 2).getOrNull(0)
-          ?: throw IllegalStateException("Invalid filename ${it.name}")
-      ts.toLongOrNull() ?: throw IllegalStateException("Invalid filename ${it.name}")
-    }.forEach {
-      println(Packet.parse(it.inputStream(), ctx))
-    }
-}
-
 sealed class Packet {
+  abstract val methodName: String
+  abstract val data: ByteString
+
   class Context(
     val deque: ConcurrentLinkedDeque<NameEntry>,
     val len: Int,
@@ -101,14 +84,11 @@ sealed class Packet {
           3 -> {
             val code = ByteBuffer.wrap(stream.readNBytes(2)).getShort().toUShort()
             if (ctx?.deque == null) throw PacketDecodeException.MissingRequestPacket(code)
-            var i = 0
             val entry =
-              ctx.deque.reversed().firstOrNull {
-                i++
-                it.code == code
-              }
+              ctx.deque
+                .reversed()
+                .firstOrNull { it.code == code }
                 ?: throw PacketDecodeException.MissingRequestPacket(code)
-            println("$i")
             val data = stream.readByteString(stream.available())
             Response(code, entry.methodName, data)
           }
@@ -134,8 +114,8 @@ sealed class Packet {
  * server -> client actively
  */
 data class Notify(
-  val methodName: String,
-  val data: ByteString,
+  override val methodName: String,
+  override val data: ByteString,
 ) : Packet()
 
 /**
@@ -143,8 +123,8 @@ data class Notify(
  */
 data class Request(
   val code: UShort,
-  val methodName: String,
-  val data: ByteString,
+  override val methodName: String,
+  override val data: ByteString,
 ) : Packet()
 
 /**
@@ -152,6 +132,6 @@ data class Request(
  */
 data class Response(
   val code: UShort,
-  val methodName: String,
-  val data: ByteString,
+  override val methodName: String,
+  override val data: ByteString,
 ) : Packet()

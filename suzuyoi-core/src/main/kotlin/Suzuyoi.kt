@@ -19,7 +19,7 @@ import io.ktor.server.websocket.*
 import io.ktor.websocket.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import moe.sdl.suzuyoi.protos.handleLobbyServerPacket
+import moe.sdl.suzuyoi.protos.handleLobbyServerRequest
 import kotlin.time.Duration.Companion.seconds
 
 fun main(): Unit =
@@ -38,9 +38,8 @@ fun main(): Unit =
             when (frame) {
               is Frame.Binary -> {
                 launch {
-                  val pkt = Packet.parse(frame.data.inputStream().buffered())
-                  when (pkt) {
-                    is Request -> handleLobbyServerPacket(LobbyServerImpl, pkt.methodName, pkt.data)
+                  when (val pkt = Packet.parse(frame.data.inputStream().buffered())) {
+                    is Request -> handleLobbyServerRequest(LobbyServerImpl, pkt.methodName, pkt.data)
                     is Notify -> throw IllegalStateException("Server should not receive notify packet")
                     is Response -> throw IllegalStateException("Server should not receive response packet")
                   }

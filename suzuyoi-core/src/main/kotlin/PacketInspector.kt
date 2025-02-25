@@ -9,8 +9,10 @@
  */
 package moe.sdl.suzuyoi
 
-import moe.sdl.suzuyoi.protos.parseLobbyServerRequestPacket
-import moe.sdl.suzuyoi.protos.parseLobbyServerResponsePacket
+import moe.sdl.suzuyoi.protos.*
+import okio.buffer
+import okio.sink
+import okio.source
 import java.io.File
 import java.util.concurrent.ConcurrentLinkedDeque
 import kotlin.io.path.Path
@@ -22,9 +24,12 @@ fun main() {
       .getenv("RECORDS_PATH")
       ?.also { require(Path(it).exists()) }
       ?.let { File(it) }
-      ?: File("records")
+      ?: File("/Users/col/Developer/majsoul-pro/records")
   println("Scanning root = `${root.absolutePath}`")
   val ctx = Packet.Context(ConcurrentLinkedDeque(), 50)
+  var i = 0
+  val failureTypes = hashMapOf<String, Int>()
+  val failureTypesLen = hashMapOf<String, MutableList<Int>>()
   root
     .walk()
     .maxDepth(1)
@@ -37,32 +42,68 @@ fun main() {
           ?: throw IllegalStateException("Invalid filename ${it.name}")
       ts.toLongOrNull() ?: throw IllegalStateException("Invalid filename ${it.name}")
     }.forEach {
-      when (val rawPkt = Packet.parse(it.inputStream(), ctx)) {
-        is Notify -> {
-          println("Notify ${rawPkt.methodName}: not implemented")
-        }
+      runCatching {
+        when (val pkt = Packet.parse(it.inputStream(), ctx)) {
+          is Notify -> {
+            when (pkt.methodName) {
+              ".lq.ActionPrototype" -> {
+                val action =
+                  ActionPrototype.ADAPTER.decode(
+                    pkt.data
+                      .toByteArray()
+                      .inputStream()
+                      .source()
+                      .buffer(),
+                  )
+                val actions =
+                  runCatching {
+                    File("records").mkdirs()
+                    File("records/${++i}-${action.name}.bin")
+                      .sink()
+                      .buffer()
+                      .use { input ->
+                        input.write(action.data_)
+                      }
 
-        is Request -> {
-          println(
-            "code=${rawPkt.code} Req ${rawPkt.methodName}: ${
-              parseLobbyServerRequestPacket(
-                rawPkt.methodName,
-                rawPkt.data,
-              )
-            }",
-          )
-        }
+                    Actions.parseOrNull(action)
+                  }.onFailure {
+                    val last = failureTypes.getOrDefault(action.name, 0)
+                    failureTypes[action.name] = last + 1
+                    val lastLen = failureTypesLen.getOrPut(action.name) { mutableListOf() }
+                    lastLen.add(action.data_.size)
+                  }.getOrThrow()
 
-        is Response -> {
-          println(
-            "code=${rawPkt.code} Resp ${rawPkt.methodName}: ${
-              parseLobbyServerResponsePacket(
-                rawPkt.methodName,
-                rawPkt.data,
-              )
-            }",
-          )
+                println(
+                  "Notify .lq.ActionPrototype $actions",
+                )
+              }
+
+              else -> println("Notify ${pkt.methodName}: not implemented")
+            }
+          }
+
+          is Request -> {
+            val msg =
+              parseLobbyServerRequestPacketOrNull(pkt.methodName, pkt.data)
+                ?: parseFastTestServerRequestPacketOrNull(pkt.methodName, pkt.data)
+            println(
+              "code=${pkt.code} Req ${pkt.methodName}: $msg",
+            )
+          }
+
+          is Response -> {
+            val msg =
+              parseLobbyServerResponsePacketOrNull(pkt.methodName, pkt.data)
+                ?: parseFastTestServerResponsePacketOrNull(pkt.methodName, pkt.data)
+            println(
+              "code=${pkt.code} Resp ${pkt.methodName}: $msg",
+            )
+          }
         }
+      }.onFailure {
+        println("$it")
       }
     }
+  println(failureTypes.toList().sortedByDescending { it.second }.joinToString("\n") { (k, v) -> "$k -> $v" })
+  println(failureTypesLen.toList().joinToString("\n") { (k, v) -> "$k -> ${v.joinToString()}" })
 }

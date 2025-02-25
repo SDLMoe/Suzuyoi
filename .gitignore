@@ -4,4 +4,4 @@
 .kotlin
 build
 .DS_Store
-.gitignore
+/records/

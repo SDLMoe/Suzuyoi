@@ -11,6 +11,8 @@ wire {
   kotlin {
     rpcRole = "server"
     rpcCallStyle = "suspending"
+    enumMode = "sealed_class"
+    emitProtoReader32 = false
     singleMethodServices = false
   }
 }

@@ -30,7 +30,7 @@ kotlin-poet = { module = "com.squareup:kotlinpoet", version.ref = "kotlinpoet" }
 kotlin-poet-ksp = { module = "com.squareup:kotlinpoet-ksp", version.ref = "kotlinpoet" }
 ksp-api = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
-wire-runtime = { module = "com.squareup.wire:wire-runtime", version.ref = "wire" }
+wire-runtime = { module = "com.squareup.wire:wire-runtime-jvm", version.ref = "wire" }
 kotlinx-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version = "1.10.1" }
 kaml = { module = "com.charleskorn.kaml:kaml", version = "0.72.0" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version = "1.8.0" }

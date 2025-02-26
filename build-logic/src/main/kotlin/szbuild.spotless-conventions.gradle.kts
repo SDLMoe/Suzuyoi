@@ -7,7 +7,7 @@ val license: License by rootProject.extra
 spotless {
   format("documentation") {
     target("*.adoc", "*.md", "src/**/*.adoc", "src/**/*.md")
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     trimTrailingWhitespace()
     endWithNewline()
   }
@@ -15,7 +15,7 @@ spotless {
   kotlinGradle {
     targetExclude("build-logic/**/build/**")
     ktlint(requiredVersionFromLibs("ktlint"))
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     trimTrailingWhitespace()
     endWithNewline()
   }
@@ -24,7 +24,7 @@ spotless {
     targetExclude("build/generated/**", "**/src/test/resources/**")
     ktlint(requiredVersionFromLibs("ktlint"))
     licenseHeaderFile(license.headerFile)
-    indentWithSpaces(2)
+    leadingTabsToSpaces(2)
     trimTrailingWhitespace()
     endWithNewline()
   }

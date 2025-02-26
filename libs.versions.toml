@@ -37,6 +37,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 
 ktor-server-netty = { module = "io.ktor:ktor-server-netty", version.ref = "ktor" }
 ktor-server-ws = { module = "io.ktor:ktor-server-websockets", version.ref = "ktor" }
+ktor-tls = { module = "io.ktor:ktor-network-tls-certificates", version.ref = "ktor" }
 
 # Only declared here so Dependabot knows when to update the referenced versions
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" }

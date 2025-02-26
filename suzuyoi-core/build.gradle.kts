@@ -12,6 +12,7 @@ application {
 dependencies {
   implementation(libs.ktor.server.netty)
   implementation(libs.ktor.server.ws)
+  implementation(libs.ktor.tls)
   implementation(libs.kaml)
   implementation(libs.kotlinx.coroutines)
   implementation(libs.kotlinx.serialization.json)

@@ -45,8 +45,8 @@ class Processor(
     this.write(str.toByteArray())
   }
 
-  @Suppress("UNCHECKED_CAST")
   override fun process(resolver: Resolver): List<KSAnnotated> {
+    logger.info("Running processor")
     val clzToFuncs =
       resolver
         .getSymbolsWithAnnotation(WIRE_RPC_CLASS_NAME)
@@ -66,6 +66,7 @@ class Processor(
 
     val funcSpecs =
       clzToFuncs.flatMap { (clz, funcs) ->
+        logger.info(clz.simpleName.asString())
         clz.containingFile?.also { usedKSFile += it }
         val wireRpcAnnotations = transformWireRpcAnnotations(funcs)
         buildList {

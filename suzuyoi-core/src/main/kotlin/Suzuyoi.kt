@@ -45,34 +45,30 @@ internal fun KeyStore.saveCertToFile(
 
 fun main(): Unit =
   runBlocking {
-    // TODO: config
-    val keyStoreFile = File("build/key.jks")
-    val certFile = File("build/key.cert")
-    val alias = "suzuyoi-dispatch-cert"
-    val privateKeyPassword = "suzuyoi-dispatch-private"
-    val keyStorePassword = "suzuyoi-dispatch"
-    val expiredDays: Long = 365 * 10L
+    val config = suzuyoiConfig.initAndLoad()
+    val certConfig = config.server.certification
+    val keystoreFile = certConfig.keyStorePath().toFile()
     val keystore =
-      if (!certFile.exists()) {
+      if (!keystoreFile.exists()) {
         val generatedKeyStore =
           buildKeyStore {
-            certificate(alias) {
+            certificate(certConfig.keyAlias) {
               hash = HashAlgorithm.SHA256
               sign = SignatureAlgorithm.RSA
               keySizeInBits = 2048
-              password = privateKeyPassword
-              daysValid = expiredDays
+              password = certConfig.privateKeyPassword
+              daysValid = certConfig.expiredDays
               domains = listOf("localhost")
               this.subject = X500Principal("CN=Suzuyoi MITM, OU=Suzuyoi, O=Suzuyoi, C=US")
               keyType = KeyType.Server
             }
           }
-        generatedKeyStore.saveToFile(keyStoreFile, keyStorePassword)
-        generatedKeyStore.saveCertToFile(certFile, alias)
+        generatedKeyStore.saveToFile(keystoreFile, certConfig.keyStorePassword)
+        generatedKeyStore.saveCertToFile(certConfig.certPath().toFile(), certConfig.keyAlias)
         generatedKeyStore
       } else {
-        val keystore = KeyStore.getInstance("JKS")
-        keystore.load(keyStoreFile.inputStream().buffered(), keyStorePassword.toCharArray())
+        val keystore = KeyStore.getInstance(certConfig.keyStoreType)
+        keystore.load(keystoreFile.inputStream().buffered(), certConfig.keyStorePassword.toCharArray())
         keystore
       }
 
@@ -81,7 +77,13 @@ fun main(): Unit =
         log = LoggerFactory.getLogger("ktor.application")
       }
     embeddedServer(factory = Netty, environment = env, configure = {
-      sslConnector(keystore, alias, { keyStorePassword.toCharArray() }, { privateKeyPassword.toCharArray() }) {
+      if (!config.server.useSSL) return@embeddedServer
+      sslConnector(
+        keystore,
+        certConfig.keyAlias,
+        { certConfig.keyStorePassword.toCharArray() },
+        { certConfig.privateKeyPassword.toCharArray() },
+      ) {
         port = 1145
       }
     }) {

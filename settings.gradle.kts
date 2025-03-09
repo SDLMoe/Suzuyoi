@@ -36,8 +36,15 @@ dependencyResolutionManagement {
 }
 
 include(":suzuyoi-core")
+include(":suzuyoi-data-provider")
 include(":suzuyoi-proto")
 include(":suzuyoi-proto-processor")
+include(":suzuyoi-utils").also {
+  include(":suzuyoi-utils:all")
+  include(":suzuyoi-utils:core")
+  include(":suzuyoi-utils:serialization")
+  include(":suzuyoi-utils:time")
+}
 
 enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
